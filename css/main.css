@@ -1,0 +1,330 @@
+/* ---------- Base & Resets ---------- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 62.5%; /* 1rem = 10px */
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 1.6rem;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.5;
+}
+
+:root {
+    --primary: #4e60ff;
+    --primary-dark: #3c48d3;
+    --text: #1d1d1f;
+    --text-light: #6e6e73;
+    --bg: #f9f9fb;
+    --card-bg: #ffffff;
+    --radius: 1.2rem;
+    --shadow: 0 .4rem .8rem rgba(0, 0, 0, .05);
+}
+
+/* ---------- Layout ---------- */
+.product-section {
+    display: grid;
+    grid-template-columns: 26rem 1fr;
+    gap: 3rem;
+    max-width: 128rem;
+    margin: 4rem auto;
+    padding: 0 2rem;
+}
+
+/* ---------- Filter Sidebar ---------- */
+.product-section__filter {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 2rem;
+}
+
+.product-section__filter h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.2rem;
+}
+
+/* Category buttons */
+.filters-category-btn {
+    font-size: 1.4rem;
+    padding: .6rem 1.2rem;
+    background: var(--bg);
+    border: none;
+    border-radius: .8rem;
+    cursor: pointer;
+    transition: background .3s, color .3s;
+    margin: .4rem;
+}
+
+.filters-category-btn:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+.filters-btn_active {
+    background: var(--primary);
+    color: #fff;
+}
+
+/* Price filter */
+.filter__price-form {
+    display: flex;
+    gap: 1rem;
+}
+
+.filter__price-form-input-price-min,
+.filter__price-form-input-price-max {
+    width: 8rem;
+    padding: .6rem 1rem;
+    border: 1px solid #d7d7db;
+    border-radius: .6rem;
+    font-size: 1.4rem;
+    background: #fff;
+}
+
+.filter__price-form-btn {
+    background: #f55151;
+    border: none;
+    padding: .6rem 1rem;
+    border-radius: .6rem;
+    cursor: pointer;
+    color: #fff;
+}
+
+/* Brands & Color lists */
+.filter__brands-list,
+.filter__color-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: .8rem;
+}
+
+.filter__brands-list-content {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    font-size: 1.4rem;
+}
+
+.filter__brands-list-total-text,
+.filter__color-list-check-total-text {
+    font-size: 1.2rem;
+    color: var(--text-light);
+}
+
+.filter__color-list-check {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+}
+
+.filter__color-list-check-label {
+    display: inline-block;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    border: 1px solid #d7d7db;
+}
+
+/* ---------- Cards Grid ---------- */
+.product-section__wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 2rem;
+    height: max-content;
+    position: relative;
+
+}
+
+.product-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 20rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform .3s, box-shadow .3s;
+    position: relative;
+    max-height: max-content;
+}
+
+.product-card:hover {
+    transform: translateY(-.4rem);
+    box-shadow: 0 .8rem 1.6rem rgba(0, 0, 0, .1);
+    z-index: 5;
+}
+
+/* Изображение сохраняет пропорции */
+.product-card__top-img {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* квадрат */
+    object-fit: cover;
+}
+
+.product-card__top-content {
+    padding: 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    /* flex: 1 1 auto; */
+}
+
+.product-card__detail a {
+    font-size: 1.6rem;
+    color: var(--text);
+    text-decoration: none;
+    transition: color .3s;
+}
+
+.product-card__detail a:hover {
+    color: var(--primary);
+}
+
+.product-card__price {
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.product-card__btn-add-to-cart {
+    /* margin-top: auto; */
+    background: var(--primary);
+    border: none;
+    color: #fff;
+    font-size: 1.4rem;
+    padding: .8rem 1.2rem;
+    border-radius: .6rem;
+    cursor: pointer;
+    transition: background .3s;
+}
+
+.product-card__btn-add-to-cart:hover {
+    background: var(--primary-dark);
+}
+
+/* Описание поверх карточки */
+.product-card__hover {
+    display: none;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: var(--card-bg);
+    padding: 1.2rem 1.6rem;
+    font-size: 1.3rem;
+    border-radius: var(--radius);
+    color: var(--text-light);
+    transform: translateY(95%);
+    opacity: 0;
+    transition: opacity .35s ease;
+    box-shadow: 0 -0.4rem 0.8rem rgba(0, 0, 0, .05);
+    box-shadow: var(--shadow);
+}
+
+.product-card:hover {
+    border-radius: 0%;
+}
+
+.product-card:hover .product-card__hover {
+    opacity: 1;
+    display: block;
+}
+
+/* ---------- Show More Button ---------- */
+.product-section__btn-show-more {
+    padding: 3rem 3rem;
+    font-size: 1.6rem;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background .3s;
+}
+
+.product-section__btn-show-more:hover {
+    background: var(--primary-dark);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 992px) {
+    .product-section {
+        grid-template-columns: 1fr;
+    }
+
+    .product-section__filter {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 2rem;
+        order: -1; /* filter выше продуктов */
+    }
+
+}
+
+@media (max-width: 576px) {
+    .filters-category-btn {
+        font-size: 1.2rem;
+    }
+
+    .product-section__wrapper {
+        grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: .8rem;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d1d1d6;
+    border-radius: .4rem;
+}
+
+
+.filter__price-quick-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter__price-quick-wrapper-btn {
+    font-size: 1.3rem;
+    padding: .6rem 1.2rem;
+    background: var(--bg);
+    border: 1px solid #d7d7db;
+    border-radius: .8rem;
+    cursor: pointer;
+    transition: background .3s, color .3s, border-color .3s;
+    color: var(--text);
+}
+
+.filter__price-quick-wrapper-btn:hover {
+    background-color: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.filter__price-quick-wrapper-btn-active {
+    background-color: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}

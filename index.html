@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNR-SALE</title>
+
+<link rel="stylesheet" href="css/main.css">
+
+<script defer src="https://kit.fontawesome.com/08db79b8a3.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/validator@13.9.0/validator.min.js"></script>
+<script src="https://kit.fontawesome.com/08db79b8a3.js" crossorigin="anonymous"></script>
+<script defer src="js/script.js"></script>
+</head>
+<body>
+<div class="product-section">
+
+    <div class="product-section__filter filter">
+        <div class="product-section__filter-category">
+            <h2 class="product-section__filter-category-title">Категории</h2>
+            <div class="product-section__filter-category-wrapper">
+                <button class="filters-category-btn filters-btn_active" data-category="all">Все</button>
+                <button class="filters-category-btn" data-category="womens-dresses">Женская одежда</button>
+                <button class="filters-category-btn" data-category="mens-shirts">Мужские рубашки</button>
+                <button class="filters-category-btn" data-category="womens-shoes">Женская обувь</button>
+                <button class="filters-category-btn" data-category="womens-bags">Женские сумки</button>
+                <button class="filters-category-btn" data-category="smartphones">Смартфоны</button>
+                <button class="filters-category-btn" data-category="laptops">Ноутбуки</button>
+                <button class="filters-category-btn" data-category="mens-watches">Часы мужские</button>
+                 <button class="filters-category-btn" data-category="womens-watches">Часы женские</button>
+            </div>
+        </div>
+
+        <div class="filter__price">
+                <h2 class="filter__price-title">Цена</h2>
+                <div class="filter__price-quick-wrapper">
+                    <button type="button" class="filter__price-quick-wrapper-btn" data-min="" data-max="5000">до 5 000 ₽уб</button>
+                    <button type="button" class="filter__price-quick-wrapper-btn" data-min="5000" data-max="15000">от 5 000 до 15 000 ₽уб</button>
+                    <button type="button" class="filter__price-quick-wrapper-btn" data-min="15000" data-max="35000">от 15 000 до 35 000 ₽уб</button>
+                    <button type="button" class="filter__price-quick-wrapper-btn" data-min="35000" data-max="70000">от 35 000 до 70 000 ₽уб</button>
+                    <button type="button" class="filter__price-quick-wrapper-btn" data-min="70000" data-max="">от 70 000 ₽уб</button>
+                </div>
+                <form class="filter__price-form">
+                        <div>
+                            <label for="price-min"></label>
+
+                            <input class="filter__price-form-input-price-min" type="number" id="filter-price-min" placeholder="Min">
+                        
+                        </div>
+                        <div>
+
+                            <label for="price-max"></label>
+
+                            <input class="filter__price-form-input-price-max" type="number" id="filter-price-max" placeholder="Max">
+                        
+                        </div>
+                        <div>
+
+                            <button class="filter__price-form-btn" type="button"><i class="fa-solid fa-delete-left"></i></button>
+                        </div>
+                </form>
+        </div>
+
+        <div class="filter__brands">
+            <h2 class="filter__brands-title">Бренд</h2>
+                <ul class="filter__brands-list">
+                    <li>
+                        <div class="filter__brands-list-content">
+
+                            <input class="filter__brands-list-content-input" type="checkbox" value="Samsung">
+
+                            <span>Samsung</span>
+                        </div>
+
+                        <span class="filter__brands-list-total-text"></span>
+                    </li>
+                    <li>
+                        <div class="filter__brands-list-content">
+
+                            <input class="filter__brands-list-content-input" type="checkbox"  value="Apple">
+
+                            <span>Apple</span></div>
+
+                        <span class="filter__brands-list-total-text"></span>
+                    </li>
+                    <li>
+                        <div class="filter__brands-list-content">
+
+                            <input class="filter__brands-list-content-input" type="checkbox"  value="Rolex">
+
+                            <span>Rolex</span></div>
+
+                        <span class="filter__brands-list-total-text"></span>
+                    </li>
+                    <li>
+                        <div class="filter__brands-list-content">
+
+                            <input class="filter__brands-list-content-input" type="checkbox"  value="Nike">
+
+                            <span>Nike</span></div>
+
+                        <span class="filter__brands-list-total-text"></span>
+                    </li>
+                    <li>
+                        <div class="filter__brands-list-content">
+
+                            <input class="filter__brands-list-content-input" type="checkbox"  value="Puma">
+
+                            <span>Puma</span></div>
+
+                        <span class="filter__brands-list-total-text"></span>
+                    </li>
+                </ul>
+
+        </div>
+
+
+
+    </div>
+    <!-- Контейнер с карточками -->
+    <div class="product-section__wrapper">
+            <!-- <div class="product-section__wrapper-card product-card">
+
+                <div class="product-card__top">
+                    <img class="product-card__top-img" src="images/product/men/product6.jpg" alt="">
+                </div>
+                <div class="product-card__top-content">
+                    <div class="product-card__detail">
+                        <a href="product-detail.html">New Fashion B Nice Elegant</a>
+                    </div>
+
+                    <div class="product-card__price">$125.00</div>
+                    <button class="product-card__btn-add-to-cart">В корзину</button>
+                    <div class="product-card__hover">
+                        <div class="product-card__preview-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="product-section__wrapper-card product-card">
+                <div class="product-card__top">
+                    <img class="product-card__top-img" src="images/product/men/product6.jpg" alt="">
+                </div>
+                <div class="product-card__top-content">
+                    <div class="product-card__detail">
+                        <a href="product-detail.html">New Fashion B Nice Elegant</a>
+                    </div>
+
+                    <div class="product-card__price">$125.00</div>
+                    <button class="product-card__btn-add-to-cart">В корзину</button>
+                    <div class="product-card__hover">
+                        <div class="product-card__preview-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-section__wrapper-card product-card">
+                <div class="product-card__top">
+                    <img class="product-card__top-img" src="images/product/men/product6.jpg" alt="">
+                </div>
+                <div class="product-card__top-content">
+                    <div class="product-card__detail">
+                        <a href="product-detail.html">New Fashion B Nice Elegant</a>
+                    </div>
+
+                    <div class="product-card__price">$125.00</div>
+                    <button class="product-card__btn-add-to-cart">В корзину</button>
+                    <div class="product-card__hover">
+                        <div class="product-card__preview-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="product-section__wrapper-card product-card">
+                <div class="product-card__top">
+                    <img class="product-card__top-img" src="images/product/men/product6.jpg" alt="">
+                </div>
+                <div class="product-card__top-content">
+                    <div class="product-card__detail">
+                        <a href="product-detail.html">New Fashion B Nice Elegant</a>
+                    </div>
+
+                    <div class="product-card__price">$125.00</div>
+                    <button class="product-card__btn-add-to-cart">В корзину</button>
+                    <div class="product-card__hover">
+                        <div class="product-card__preview-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="product-section__wrapper-card product-card">
+                <div class="product-card__top">
+                    <img class="product-card__top-img" src="images/product/men/product6.jpg" alt="">
+                </div>
+                <div class="product-card__top-content">
+                    <div class="product-card__detail">
+                        <a href="product-detail.html">New Fashion B Nice Elegant</a>
+                    </div>
+
+                    <div class="product-card__price">$125.00</div>
+                    <button class="product-card__btn-add-to-cart">В корзину</button>
+                    <div class="product-card__hover">
+                        <div class="product-card__preview-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="product-section__wrapper-card product-card">
+                <div class="product-card__top">
+                    <img class="product-card__top-img" src="images/product/men/product6.jpg" alt="">
+                </div>
+                <div class="product-card__top-content">
+                    <div class="product-card__detail">
+                        <a href="product-detail.html">New Fashion B Nice Elegant</a>
+                    </div>
+
+                    <div class="product-card__price">$125.00</div>
+                    <button class="product-card__btn-add-to-cart">В корзину</button>
+                    <div class="product-card__hover">
+                        <div class="product-card__preview-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="product-section__wrapper-card product-card">
+                <div class="product-card__top">
+                    <img class="product-card__top-img" src="images/product/men/product6.jpg" alt="">
+                </div>
+                <div class="product-card__top-content">
+                    <div class="product-card__detail">
+                        <a href="product-detail.html">New Fashion B Nice Elegant</a>
+                    </div>
+
+                    <div class="product-card__price">$125.00</div>
+                    <button class="product-card__btn-add-to-cart">В корзину</button>
+                    <div class="product-card__hover">
+                        <div class="product-card__preview-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+            <button class="product-section__btn-show-more">Показать ещё</button>
+    </div>
+
+    
+
+
+</div>
+
+
+</body>
+</html>
+
+                                
+                                
+                                
+                                
