@@ -3,7 +3,6 @@
 // После загрузки страницы
 
 document.addEventListener("DOMContentLoaded", function (e) {
-
     const filterContainer = document.querySelector(".product-section__filter");
     // Категории (кнопки)
     const categoryContainer = document.querySelector(".product-section__filter-category-wrapper");
@@ -29,252 +28,246 @@ document.addEventListener("DOMContentLoaded", function (e) {
     // Кнопка "Показать ещё" (если будешь реализовывать)
     const showMoreBtn = document.querySelector('.product-section__btn-show-more');
 
-
-    let objFilter = {
-        category: [],
-        brands: [],
+    const objFilter = {
         priceMin: null,
         priceMax: null,
-
-    };
+        category: [],
+        brands: [],
+    }
 
     let flagFilter = false;
 
+    class ProductManager {
+        allProducts = [];
+        constructor () {
+            this.loadProducts();
 
-   class Product {
-    constructor(id, title, price, brand, category, color, thumbnail, descr) {
-        this.id = id;
-        this.title = title;
-        this.price = price;
-        this.brand = brand;
-        this.category = category;
-        this.color = color;
-        this.thumbnail = thumbnail;
-        this.descr = descr;
-    }
-   }
+        }
 
-   class ProductManager {
-    allProduct = [];
-    
-    constructor() {
-        this.loadProducts();
-        // this.filterManager = new FilterManager();
+        async loadProducts() {
+            const categories = [
+                'womens-dresses',
+                'womens-shoes',
+                'womens-watches',
+                'womens-bags',
+                'tops',
+                'mens-shirts',
+                'mens-shoes',
+                'mens-watches',
+                'smartphones',
+                'laptops',
+                'lighting'
+            ];
 
-    }
-
-    // Загрузка с API
-    loadProducts(objFilter, flagF) {
-        const categories = [
-            'womens-dresses',
-            'womens-shoes',
-            'womens-watches',
-            'womens-bags',
-            'tops',
-            'mens-shirts',
-            'mens-shoes',
-            'mens-watches',
-            'smartphones',
-            'laptops',
-            'lighting'
-        ];
-
-        const fetchPromises = categories.map(category => {
-            return fetch(`https://dummyjson.com/products/category/${category}`)
+            const fetchPromises = categories.map(category => {
+                return fetch(`https://dummyjson.com/products/category/${category}`)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Ошибка сети: ' + response.status);
+                        throw new Error('Ошибка сети: '+ response.status);
                     }
                     return response.json();
                 })
-                .then(data => data.products)
+                .then((data) => {
+                    return data.products;
+                })
                 .catch(error => {
-                    console.error('Произошла ошибка: ', error.message);
+                    console.error('Произошла ошибка:', error.message);
                     return [];
-                });
-        });
+                })
+            });
 
-        Promise.all(fetchPromises)
-        .then(products => {
-            this.allProduct = products.flat();
-            console.log(this.allProduct);
+            console.log(fetchPromises);
             
-            if (!flagF && !objFilter) {
-                this.renderProducts(this.allProduct);
+
+
+            this.allProducts = await Promise.all(fetchPromises).then(products => products.flat());
+
+            console.log(this.allProducts);
+            
+
+            if (!flagFilter) {
+                this.renderProducts(this.allProducts);
             }
 
+
+
+        }
+
+        allFilters(objFilter, flagF) {
             if (flagF && objFilter) {
-                const productsFilters = this.allProduct.filter((prod) => {
-                   const filterCategory = objFilter.category.length === 0 || objFilter.category.includes(prod.category);
-                   const filterBrands = objFilter.brands.length === 0 || objFilter.brands.includes(prod.brand);
-                   const filterMinPrice = !objFilter.priceMin || prod.price >= objFilter.priceMin;
-                   const filterMaxPrice = !objFilter.priceMax || prod.price <= objFilter.priceMax;
-                   return filterCategory && filterBrands && filterMinPrice && filterMaxPrice;
+                const productsFilters = this.allProducts.filter((prod) => {
+
+                    const filterCategory = objFilter.category.length === 0 || objFilter.category.includes(prod.category);
+
+                    const filterMinPrice = !objFilter.priceMin || prod.price >= objFilter.priceMin;
+
+                    const filterMaxPrice = !objFilter.priceMax || prod.price <= objFilter.priceMax;
+
+                    const filterBrands = objFilter.brands.length === 0 || objFilter.brands.includes(prod.brand);
+
+
+                    return filterCategory && filterMinPrice && filterMaxPrice && filterBrands;
                 });
-            productsContainer.innerHTML = "";
-            this.renderProducts(productsFilters);
+                productsContainer.innerHTML = "";
+                this.renderProducts(productsFilters);
+            }
+        }
+
+        renderProducts(products) {
+            products.forEach(function (prod) {
+                const html = `
+                
+                    <div class="product-section__wrapper-card product-card" id="${prod.id}">
+
+                        <div class="product-card__top">
+                            <img class="product-card__top-img" src="${prod.images[0]}" alt="">
+                        </div>
+                        <div class="product-card__top-content">
+                            <div class="product-card__detail">
+                                <a href="product-detail.html">${prod.title}</a>
+                            </div>
+
+                            <div class="product-card__price">${Math.round(prod.price * 90)} Руб</div>
+                            <button class="product-card__btn-add-to-cart">В корзину</button>
+                            <div class="product-card__hover">
+                                <div class="product-card__preview-description">
+                                ${prod.description}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                `;
+
+                productsContainer.insertAdjacentHTML("afterbegin", html);
+            });
+        }
+
+
+    }
+
+    class FilterManager {
+        constructor (productManager) {
+            this.productManager = productManager;
+            categoryContainer.addEventListener("click", this.getActiveCategory.bind(this));
+            priceMinInput.addEventListener("input", this.getPriceFilter.bind(this));
+            priceMaxInput.addEventListener("input", this.getPriceFilter.bind(this));
+            quickPriceContainer.addEventListener("click", this.quickPricesForm.bind(this));
+            resetPricesInputs.addEventListener("click", this.resetPricesInputsForm.bind(this));
+            brandCheckboxesContainer.addEventListener("change", this.changeBrandCheckboxes.bind(this));
+
+        }
+
+        getActiveCategory(e) {
+            
+
+            if (e.target.classList.contains("filters-category-btn")) {
+
+                if (!objFilter.category.includes(e.target.dataset.category)) {
+                    objFilter.category.unshift(e.target.dataset.category);
+                    e.target.classList.add("filters-btn_active");
+                } else {
+                    objFilter.category = objFilter.category.filter(function (categor) {
+                        return categor != e.target.dataset.category;
+                    });
+
+                    e.target.classList.remove("filters-btn_active");
+                }
+
+                flagFilter = true;
+                this.productManager.allFilters(objFilter, flagFilter);
+                
             }
 
-        
-
-
-           
-
-                
-            
-        });
-
-    }
-
-
-
-
-    renderProducts(products) {
-        products.forEach(function (prod) {
-        const html = `
-            <div class="product-section__wrapper-card product-card" id="${prod.id}">
-                <div class="product-card__top">
-                    <img class="product-card__top-img" src="${prod.images[0]}" alt="">
-                </div>
-                <div class="product-card__top-content">
-                    <div class="product-card__detail">
-                        <a href="product-detail.html">${prod.title}</a>
-                    </div>
-
-                    <div class="product-card__price">${Math.round(prod.price * 90)} ₽уб</div>
-                    <button class="product-card__btn-add-to-cart">В корзину</button>
-                    <div class="product-card__hover">
-                        <div class="product-card__preview-description">${prod.description}</div>
-                    </div>
-                </div>
-            </div>
-        
-        `;
-
-        
-        productsContainer.insertAdjacentHTML("afterbegin", html);
-
-        });
-
-
-
-    }
-
-    clearProducts() {
-
-    }
-
-   }
-
-   class FilterManager {
-
-    constructor(productManager) {
-        this.productManager = productManager;
-        filterContainer.addEventListener("click", this.getActiveCategory.bind(this));
-        brandCheckboxesContainer.addEventListener("change", this.changeBrandCheckboxes.bind(this));
-        priceMinInput.addEventListener("input", this.getPriceFilter.bind(this));
-        priceMaxInput.addEventListener("input", this.getPriceFilter.bind(this));
-        resetPricesInputs.addEventListener("click", this.resetPricesInputsForm.bind(this));
-        quickPriceContainer.addEventListener("click", this.quickPricesForm.bind(this));
-
-    }
-// Фильтры бренды
-    changeBrandCheckboxes(e) {
-        const value = e.target.value;
-        console.log(value);
-        
-        if (!value) return;
-
-        if (!objFilter.brands.includes(value)) {
-            objFilter.brands.unshift(value);
-        } else {
-            objFilter.brands = objFilter.brands.filter(elem => elem !== value);
         }
-        this.productManager.loadProducts(objFilter, true);
 
-    }
+        getPriceFilter(e) {
 
-// Фильтр по категориям
-    getActiveCategory(e) {
-    const target = e.target;
+            // Переводим рубли в доллары
+            const conversionRate = 90;
 
-    // Категории
-    if (target.classList.contains("filters-category-btn")) {
-        if (!objFilter.category.includes(target.dataset.category)) {
-            objFilter.category.unshift(target.dataset.category);
-            target.classList.add("filters-btn_active");
-        } else {
-            objFilter.category = objFilter.category.filter(elem => elem !== target.dataset.category);
-            target.classList.remove("filters-btn_active");
+            const min = Number(priceMinInput.value);
+            const max = Number(priceMaxInput.value);
+
+            if (objFilter.priceMin) objFilter.priceMin = null;
+            if (objFilter.priceMax) objFilter.priceMax = null;
+
+            objFilter.priceMin = min > 0 ? min  / conversionRate : null;
+            objFilter.priceMax = max > 0 ? max  / conversionRate : null;
+
+            allQuickPriceBtn.forEach(function (btn) {
+                btn.classList.remove("filter__price-quick-wrapper-btn-active");
+            });
+
+            flagFilter = true;
+
+            this.productManager.allFilters(objFilter, flagFilter);
+
         }
-        this.productManager.loadProducts(objFilter, true);
+
+        quickPricesForm(e) {
+
+            if (e.target.classList.contains("filter__price-quick-wrapper-btn")) {
+
+            // Переводим рубли в доллары
+            const conversionRate = 90;
+
+            allQuickPriceBtn.forEach(function (btn) {
+                btn.classList.remove("filter__price-quick-wrapper-btn-active");
+            });
+
+            priceMinInput.value = e.target.dataset.min;
+            priceMaxInput.value = e.target.dataset.max;
+
+            objFilter.priceMin = Number(priceMinInput.value) / conversionRate;
+            objFilter.priceMax = Number(priceMaxInput.value) / conversionRate;
+
+            e.target.classList.add("filter__price-quick-wrapper-btn-active");
+
+            flagFilter = true;
+
+            this.productManager.allFilters(objFilter, flagFilter);
+
+            }
+
+
+        }
+
+        resetPricesInputsForm(e) {
+
+            priceMinInput.value = null;
+            priceMaxInput.value = null;
+
+            objFilter.priceMin = null;
+            objFilter.priceMax = null;
+
+            allQuickPriceBtn.forEach(function (btn) {
+                btn.classList.remove("filter__price-quick-wrapper-btn-active");
+            });
+
+            flagFilter = true;
+            this.productManager.allFilters(objFilter, flagFilter);
+
+        }
+
+        changeBrandCheckboxes(e) {
+            const value = e.target.value;
+
+            if (!value) return;
+
+            if (!objFilter.brands.includes(value)) {
+                objFilter.brands.unshift(value);
+            } else {
+                objFilter.brands = objFilter.brands.filter(brand => {
+                    return brand != value;
+                });
+            }
+            flagFilter = true;
+            this.productManager.allFilters(objFilter, flagFilter);
+        }
     }
 
-}
-
-// Цены ручной ввод
-getPriceFilter(e) {
-        // Цены
-        
-        const minPriceRub = Number(priceMinInput.value);
-        const maxPriceRub = Number(priceMaxInput.value);
-
-        // Переводим рубли в доллары
-        const conversionRate = 90;
-        if (objFilter.priceMin) objFilter.priceMin = null;
-        if (objFilter.priceMax) objFilter.priceMax = null;
-        objFilter.priceMin = minPriceRub > 0 ? minPriceRub / conversionRate : null;
-        objFilter.priceMax = maxPriceRub > 0 ? maxPriceRub / conversionRate : null;
-
-
-        console.log(objFilter); 
-        
-        this.productManager.loadProducts(objFilter, true);
-
-
-}
-
-// Сбросить значение интпутов цен
-resetPricesInputsForm(e) {
-    priceMaxInput.value = null;
-    priceMinInput.value = null;
-    objFilter.priceMin = null;
-    objFilter.priceMax = null;
-    this.productManager.loadProducts(objFilter, true);
-    allQuickPriceBtn.forEach(btn => {
-        btn.classList.remove("filter__price-quick-wrapper-btn-active");
-    });
-}
-
-// Авто подставка цен
-quickPricesForm(e) {
-    if (e.target.classList.contains("filter__price-quick-wrapper-btn")) {
-        allQuickPriceBtn.forEach(btn => {
-            btn.classList.remove("filter__price-quick-wrapper-btn-active");
-        });
-        // Переводим рубли в доллары
-        const conversionRate = 90;
-        priceMinInput.value = e.target.dataset.min;
-        priceMaxInput.value = e.target.dataset.max;
-
-        objFilter.priceMin = Number(priceMinInput.value) / conversionRate;
-        objFilter.priceMax = Number(priceMaxInput.value) / conversionRate;
-        e.target.classList.add("filter__price-quick-wrapper-btn-active");
-
-        this.productManager.loadProducts(objFilter, true);
-
-    }
-}
-
-}
-
-
-
-    
-
-
-const productManager = new ProductManager(objFilter, false);
-const filterManager = new FilterManager(productManager);
-
-    
+    const productManager = new ProductManager();
+    const filterManager = new FilterManager(productManager);
 });

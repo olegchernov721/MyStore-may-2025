@@ -1,0 +1,80 @@
+@media (max-width: 1808px) {
+    .product-section {
+        width: 80%;
+    }
+
+}
+
+@media (max-width: 1600px) {
+    .product-section {
+        width: 90%;
+    }
+
+}
+
+
+@media (max-width: 1440px) {
+    .product-section {
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 1316px) {
+    .product-section {
+        grid-template-columns: 25% 75%;
+    }
+
+}
+
+@media (max-width: 1086px) {
+    .product-section {
+        padding-top: 6rem;
+        grid-template-columns: 100%;
+        grid-template-rows: 30rem calc(100% - 30rem);
+        margin: 0 auto;
+    }
+
+    .product-section__open-filter-btn {
+        display: block;
+        position: absolute;
+        top: 0.5rem;
+        left: 1.5rem;
+    }
+
+    .product-section__open-filter-btn i {
+        font-size: 4rem;
+        color: #4e60ff;
+        cursor: pointer;
+    }
+
+    .product-section__filter {
+        position: absolute;
+        min-height: max-content;
+        width: 70%;
+        top: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        gap: 1rem;
+    }
+
+    .filter__close {
+        width: max-content;
+        height: max-content;
+        align-self: flex-end;
+        display: block;
+        border: none;
+    }
+
+      .filter__close i {
+        color: rgb(75, 75, 75);
+        font-size: 2.5rem;
+        cursor: pointer;
+    }
+
+    .filter__brands-list {
+        flex-direction: row;
+    }
+
+}
