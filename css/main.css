@@ -338,3 +338,70 @@ body {
     color: #fff;
     border-color: var(--primary);
 }
+
+
+/* Шапка сайта */
+
+.header {
+  background: var(--primary-dark); /* #3c48d3 */
+  box-shadow: var(--shadow);
+  padding: 1.5rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header__container {
+  max-width: 70%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.header__logo {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  margin-right: 5rem;
+}
+
+.header__nav {
+    width: 100%;
+}
+
+.header__nav-list {
+  display: flex;
+  width: 100%;
+  gap: 2rem;
+  list-style: none;
+  justify-content: space-between;
+
+}
+
+.header__nav-link {
+  font-size: 1.6rem;
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s;
+  position: relative;
+  display: block;
+}
+
+.header__nav-link i {
+    font-size: 2.5rem;
+}
+
+.header__nav-link:hover {
+  color: #3ef52d;
+}
+
+.header__nav-link-number-of-products {
+    position: absolute;
+    top: -1rem;
+    right: -1rem;
+    font-size: 1.5rem;
+    font-weight: 800;;
+    color: #f55151;
+}
