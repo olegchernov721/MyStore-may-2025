@@ -3,7 +3,8 @@
 // После загрузки страницы
 
 document.addEventListener("DOMContentLoaded", function (e) {
-
+    
+    const numberOfProducts = document.querySelector(".header__nav-link-number-of-products");
      const filterContainer = document.querySelector(".product-section__filter");
     // Категории (кнопки)
     const categoryContainer = document.querySelector(".product-section__filter-category-wrapper");
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
         renderedProducts = [];
         constructor () {
             this.loadProducts();
+            productsContainer.addEventListener("click", this.addToCart.bind(this));
 
         }
 
@@ -115,6 +117,10 @@ document.addEventListener("DOMContentLoaded", function (e) {
             console.log(products);
 
             this.renderedProducts = products;
+            let cart = JSON.parse(localStorage.getItem('cart'));
+            if (cart) {
+                numberOfProducts.textContent = cart.length;
+            }
             
 
             products.forEach(function (prod) {
@@ -141,7 +147,8 @@ document.addEventListener("DOMContentLoaded", function (e) {
                 `;
                 productsContainer.insertAdjacentHTML("afterbegin", html);
             });
-            productsContainer.addEventListener("click", this.addToCart.bind(this));
+            // localStorage.removeItem("cart");
+            
         }
         
         addToCart(e) {
@@ -152,6 +159,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
                 const product = this.renderedProducts.find(prod => prod.id === id);
 
                 if (!product) return;
+
 
                 // Ищем товар по id
                 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -166,18 +174,19 @@ document.addEventListener("DOMContentLoaded", function (e) {
                     cart.push({
                         id: product.id,
                         title: product.title,
-                        descr: product.description.slice(0, 10) + "...",
+                        descr: product.description,
                         price: Number(product.price),
+                        images: product.images && product.images[0] ? product.images[0] : "",
                         quantity: 1,
                     });
                 }
 
-                console.log(cart);
-                
-
                 // Сохраняем обратно
 
                 localStorage.setItem('cart', JSON.stringify(cart));
+
+                // Обновляем число товаров в корзине
+                numberOfProducts.textContent = cart.length;
             }
 
         }

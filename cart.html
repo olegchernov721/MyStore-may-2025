@@ -5,30 +5,115 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DNR-SALE</title>
 
+<link rel="stylesheet" href="css/cart.css">
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/media.css">
 
 <script defer src="https://kit.fontawesome.com/08db79b8a3.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/validator@13.9.0/validator.min.js"></script>
 <script src="https://kit.fontawesome.com/08db79b8a3.js" crossorigin="anonymous"></script>
-<script defer src="js/script.js"></script>
+<script defer src="js/cart.js"></script>
+<!-- <script defer src="js/script.js"></script> -->
 </head>
 <body>
 <header class="header">
   <div class="header__container">
-    <a href="index.html" class="header__logo">DNR-SALE</a>
+    <a href="index.html" class="header__logo">DNR.SALE</a>
     <nav class="header__nav">
       <ul class="header__nav-list">
         <li><a href="index.html" class="header__nav-link">Главная</a></li>
         <li><a href="cart.html" class="header__nav-link"><i class="fa-solid fa-basket-shopping"></i> 
         
-            <div class="header__nav-link-number-of-products">0</div>
+            <div class="header__nav-link-number-of-products"></div>
         
         </a></li>
       </ul>
     </nav>
   </div>
 </header>
+<div class="cart-content">
+<div class="cart-content__added-products">
+    <h2 class="cart-content__added-products-title">Добавленные товары</h2>
+        <div class="cart-content__added-products-btn-wrapper">
+        <button class="cart-content__added-products-select">Выбрать все</button>
+        <button class="cart-content__added-products-delete-selected-ones hidden">Удалить выбранные</button>
+        </div>
+    <div class="cart-content__added-products-cards">
+        <!-- <div class="added-card" data-id="123">
+        <label class="added-card__select">
+            <input type="checkbox" class="added-card__checkbox" />
+            <span></span>
+        </label>
+
+        <div class="added-card__image">
+            <img src="" alt="Кроссовки" />
+        </div>
+
+        <div class="added-card__info">
+            <div class="added-card__title">Кроссовки</div>
+            <div class="added-card__descr">Описание...</div>
+            <div class="added-card__price">3500 ₽</div>
+        </div>
+
+        <div class="added-card__quantity">
+            <button class="quantity-btn quantity-btn--minus">−</button>
+            <span class="quantity-value">1</span>
+            <button class="quantity-btn quantity-btn--plus">+</button>
+        </div>
+
+        <button class="added-card__remove">
+            <i class="fa-solid fa-trash"></i> Удалить
+        </button>
+        </div> -->
+
+    </div>
+</div>
+<div class="cart-content__right-wrapper">
+
+<div class="cart-content__right-wrapper-arrange wrapper-arrange">
+
+    <div class="wrapper-arrange__products">
+        Нет выбранных товаров
+
+        <!-- <div class="arrange-card" data-id="123">
+            <div class="arrange-card__image">
+                <img src="" alt="Кроссовки" />
+            </div>
+
+            <div class="arrange-card__info">
+                <div class="arrange-card__title">Кроссовки</div>
+                <div class="arrange-card__price">3500 ₽</div>
+            </div>
+
+            <div class="arrange-card__quantity">
+                <span class="arrange-card__quantity-value">1</span> Шт
+            </div>
+        </div> -->
+
+    </div>
+
+
+    <div class="cart-content__added-products-to-purchase products-to-purchase">
+        <div class="products-to-purchase__all">Выбрано товаров: <span class="products-to-purchase__all-span">0</span></div>
+        <div class="products-to-purchase__amount">На сумму: <span class="products-to-purchase__amount-span">0 ₽</span></div>
+    </div>
+
+    <button class="wrapper-arrange__btn-place-an-order">Оформить заказ</button>
+
+
+
+</div>
+
+
+
+<!-- <div class="cart-content__trash-can">
+    <h2 class="cart-content__trash-can-title">Удалённые товары</h2>
+    <i class="fa-solid fa-trash-can"></i>
+</div> -->
+
+</div>
+
+</div>
 
 
 </body>

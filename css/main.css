@@ -400,8 +400,19 @@ body {
 .header__nav-link-number-of-products {
     position: absolute;
     top: -1rem;
-    right: -1rem;
-    font-size: 1.5rem;
+    right: -2.5rem;
+    font-size: 1.2rem;
     font-weight: 800;;
     color: #f55151;
+    padding: 0.25rem 0.7rem;
+    background-color: #ffffff;
+    border-radius: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.hidden {
+    display: none;
 }
