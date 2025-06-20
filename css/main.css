@@ -416,3 +416,13 @@ body {
 .hidden {
     display: none;
 }
+
+
+.active-select-all {
+    background-color: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    box-shadow: 0 0 0.4rem rgba(78, 96, 255, 0.4);
+    transition: background 0.3s, box-shadow 0.3s;
+}

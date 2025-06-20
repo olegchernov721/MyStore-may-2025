@@ -3,6 +3,7 @@
 // После загрузки страницы
 
 document.addEventListener("DOMContentLoaded", function (e) {
+    // localStorage.removeItem("cart");
     
     const numberOfProducts = document.querySelector(".header__nav-link-number-of-products");
      const filterContainer = document.querySelector(".product-section__filter");

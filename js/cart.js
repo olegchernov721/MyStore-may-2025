@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", function (e) {
     const prodAmountSpan = document.querySelector(".products-to-purchase__amount-span");
     const wrapperArrangeProducts = document.querySelector(".wrapper-arrange__products");
     const btnDeleteSelectedCards = document.querySelector(".cart-content__added-products-delete-selected-ones");
+    const btnAllSelectProducts = document.querySelector(".cart-content__added-products-select");
+    const btnDeleteProduct = document.querySelector(".added-card__remove");
 
     // Класс для управления корзиной
     class CartManager {
@@ -22,6 +24,9 @@ document.addEventListener("DOMContentLoaded", function (e) {
             this.loadCart.bind(this);
             cardsContainer.addEventListener("change", this.changeProductCheckboxes.bind(this));
             btnDeleteSelectedCards.addEventListener("click", this.btnDeleteSelectedProducts.bind(this));
+            btnAllSelectProducts.addEventListener("click", this.methodAllSelectProducts.bind(this));
+            cardsContainer.addEventListener("click", this.deleteOneProduct.bind(this));
+            cardsContainer.addEventListener("click", this.editQuantityProduct.bind(this));
         }
 
         // Загружает корзину из localStorage и отображает товары
@@ -45,6 +50,27 @@ document.addEventListener("DOMContentLoaded", function (e) {
             this.renderArrangeProducts();
             // Подсчитываем количество и сумму выбранных товаров
             this.selectedQuantityAndAmount();
+
+            // При запуске определяем и устанавливаем состояние кнопки "Выбрать всё"
+            this.conditionBtnAllSelectProducts();
+
+
+        }
+
+        // Метод определения и устанавки состояния кнопки "Выбрать всё"
+        conditionBtnAllSelectProducts() {
+
+            const allCheckbox = document.querySelectorAll(".added-card__checkbox");
+
+            const allChecked = Array.from(allCheckbox).every(function (elem) {
+                return elem.checked === true;
+            });
+
+            // Если все карточки выбраны, то добавляем класс активности кнопке 
+            if (allChecked) {
+                btnAllSelectProducts.classList.add("active-select-all");
+            }
+
         }
 
         saveCart() {
@@ -57,6 +83,121 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
         clearCart() {
             // Заглушка для очистки корзины (реализация не добавлена)
+        }
+
+        editQuantityProduct(e) {
+            const productCard = e.target.closest(".added-card");
+            const productId = Number(e.target.closest(".added-card").dataset.id);
+            let productQuantityMinus;
+            let productQuantityPlus;
+
+            if (e.target.classList.contains("quantity-btn--minus")) {
+                this.cartItems.forEach(product => {
+                    if (product.id === productId) {
+                        if (product.quantity >= 2) {
+                            product.quantity -= 1;
+                            productCard.querySelector(".quantity-value").textContent = product.quantity;
+                            productQuantityMinus = product.quantity;
+
+                            
+                        } else {
+                            product.quantity = 1;
+                            productCard.querySelector(".quantity-value").textContent = product.quantity;
+                            productQuantityMinus = product.quantity;
+                        }
+                    }
+
+
+
+
+                });
+
+
+                this.selectedProducts.forEach(selectProd => {
+                    if (selectProd.id === productId) {
+                        selectProd.quantity = productQuantityMinus;
+                        document.querySelector(`.arrange-card[data-id="${productId}"]`).querySelector(".arrange-card__quantity-value").textContent = selectProd.quantity;
+                    }
+                });
+
+                localStorage.setItem("cart", JSON.stringify(this.cartItems));
+                localStorage.setItem("selectedProd", JSON.stringify(this.selectedProducts));
+
+                this.selectedQuantityAndAmount();
+
+
+                
+
+            }
+
+            if (e.target.classList.contains("quantity-btn--plus")) {
+                this.cartItems.forEach(product => {
+                    if (product.id === productId) {
+                        if (product.quantity < 10) {
+                            product.quantity += 1;
+                            productCard.querySelector(".quantity-value").textContent = product.quantity;
+                            productQuantityPlus = product.quantity;
+                        } else {
+                        product.quantity = 10;
+                        productCard.querySelector(".quantity-value").textContent = product.quantity;
+                        productQuantityPlus = product.quantity;
+                        }
+                    }
+                });
+
+
+                this.selectedProducts.forEach(selectProd => {
+                    if (selectProd.id === productId) {
+                        selectProd.quantity = productQuantityPlus;
+                        document.querySelector(`.arrange-card[data-id="${productId}"]`).querySelector(".arrange-card__quantity-value").textContent = selectProd.quantity;
+                    }
+                });
+
+
+
+
+                localStorage.setItem("cart", JSON.stringify(this.cartItems));
+                localStorage.setItem("selectedProd", JSON.stringify(this.selectedProducts));
+
+                this.selectedQuantityAndAmount();
+    
+            }
+
+        }
+
+        // Метод выбора всех карточек
+        methodAllSelectProducts(e) {
+            const allCheckbox = document.querySelectorAll(".added-card__checkbox");
+
+            const allChecked = Array.from(allCheckbox).every(function (elem) {
+                return elem.checked === true;
+            });
+
+            if (allChecked) {
+
+            allCheckbox.forEach(checkbox => {
+                checkbox.checked = false;
+                this.selectedProducts = [];
+                btnAllSelectProducts.classList.remove("active-select-all");
+            });
+
+            } else {
+            allCheckbox.forEach(checkbox => {
+                checkbox.checked = true;
+                this.selectedProducts = this.cartItems;
+                btnAllSelectProducts.classList.add("active-select-all");
+            });
+            }
+
+
+            localStorage.setItem("selectedProd", JSON.stringify(this.selectedProducts));
+
+            // Обновляем карточки для оформления и подсчёт сколько
+            this.renderArrangeProducts();
+            this.selectedQuantityAndAmount();
+
+
+
         }
 
         // Отображает карточки товаров в корзине
@@ -130,6 +271,11 @@ document.addEventListener("DOMContentLoaded", function (e) {
         } else {
             // Удаляем
             this.selectedProducts = this.selectedProducts.filter(p => p.id !== productId);
+            btnAllSelectProducts.classList.remove("active-select-all");
+        }
+
+        if (this.selectedProducts.length === this.cartItems.length) {
+            btnAllSelectProducts.classList.add("active-select-all");
         }
 
         // Сохраняем обновлённый массив
@@ -170,13 +316,15 @@ document.addEventListener("DOMContentLoaded", function (e) {
             }
         }
 
-        // Удаляет выбранные товары из корзины
+        // Удаляет выбранные товары из корзины по выбранным чекбоксами
         btnDeleteSelectedProducts(e) {
             localStorage.removeItem("cart");
             // Собираем id выбранных товаров
             const selectedIds = new Set(this.selectedProducts.map(prod => prod.id));
             // Оставляем только те товары, которые не были выбраны
             this.cartItems = this.cartItems.filter(item => !selectedIds.has(item.id));
+            // Обновляем число товаров в иконке корзины
+            this.updateCartIconCount();
             // Сохраняем обновлённую корзину
             localStorage.setItem("cart", JSON.stringify(this.cartItems));
 
@@ -186,10 +334,49 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
             // Очищаем массив выбранных товаров
             this.selectedProducts = [];
+            btnAllSelectProducts.classList.remove("active-select-all");
             localStorage.setItem("selectedProd", JSON.stringify(this.selectedProducts));
+
+            // Если ничего не выбрано — скрываем кнопку и сбрасываем значения
+            selectedProductsDelete.classList.add("hidden");
+            prodAllSpan.textContent = "0";
+            prodAmountSpan.textContent = `0 ₽`;
 
             // Обновляем отображение выбранных товаров для оформления
             this.renderArrangeProducts();
+
+        }
+
+        // Удаляет один товар после нажатия на кнопку "Удалить", которая внутри карточки товара
+        deleteOneProduct(e) {
+
+            const productId = e.target.closest(".added-card").dataset.id;
+
+            if (e.target.classList.contains("added-card__remove")) {
+                this.cartItems = this.cartItems.filter(prod => {
+                    return prod.id != productId;
+                });
+
+                this.selectedProducts = this.selectedProducts.filter(prod => {
+                    return prod.id != productId;
+                });
+
+                localStorage.setItem("cart", JSON.stringify(this.cartItems));
+                localStorage.setItem("selectedProd", JSON.stringify(this.selectedProducts));
+
+                // Обновляем число товаров в иконке корзины
+                this.updateCartIconCount();
+
+                // Отрисовываем карточки товаров в корзине
+                cardsContainer.innerHTML = "";
+                this.renderCartItems();
+
+                // Отрисовываем выбранные товары для оформления
+                this.renderArrangeProducts();
+                // Подсчитываем количество и сумму выбранных товаров
+                this.selectedQuantityAndAmount();
+                }
+
         }
 
         // Отображение выбранных товаров для оформления заказа
