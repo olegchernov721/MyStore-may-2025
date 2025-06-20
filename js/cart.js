@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
             // При запуске определяем и устанавливаем состояние кнопки "Выбрать всё"
             this.conditionBtnAllSelectProducts();
+            // btnAllSelectProducts.classList.remove("active-select-all");
 
 
         }
@@ -62,13 +63,21 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
             const allCheckbox = document.querySelectorAll(".added-card__checkbox");
 
-            const allChecked = Array.from(allCheckbox).every(function (elem) {
-                return elem.checked === true;
-            });
+            console.log(allCheckbox);
+            
 
+            const allChecked = allCheckbox.length >= 1 ? Array.from(allCheckbox).every(function (elem) {
+                return elem.checked === true;
+            }) : false;
+
+            
+            console.log(allChecked);
+            
             // Если все карточки выбраны, то добавляем класс активности кнопке 
             if (allChecked) {
                 btnAllSelectProducts.classList.add("active-select-all");
+            } else {
+                btnAllSelectProducts.classList.remove("active-select-all");
             }
 
         }
@@ -375,6 +384,9 @@ document.addEventListener("DOMContentLoaded", function (e) {
                 this.renderArrangeProducts();
                 // Подсчитываем количество и сумму выбранных товаров
                 this.selectedQuantityAndAmount();
+
+                // Определяем состояние кнопки "Выбрать всё"
+                this.conditionBtnAllSelectProducts();
                 }
 
         }
