@@ -3,442 +3,430 @@
 document.addEventListener("DOMContentLoaded", function (e) {
     // Получаем основные элементы DOM для работы с корзиной
     const cardsContainer = document.querySelector(".cart-content__added-products-cards");
+    const selectedCardsContainer = document.querySelector(".wrapper-arrange__products");
     const numberOfProducts = document.querySelector(".header__nav-link-number-of-products");
     const selectedProductsDelete = document.querySelector(".cart-content__added-products-delete-selected-ones");
-    const prodAllSpan = document.querySelector(".products-to-purchase__all-span");
-    const prodAmountSpan = document.querySelector(".products-to-purchase__amount-span");
-    const wrapperArrangeProducts = document.querySelector(".wrapper-arrange__products");
+    const quantityAllSelectedProd = document.querySelector(".products-to-purchase__all-span");
+    const quantityAllAmountSelectedProdprod = document.querySelector(".products-to-purchase__amount-span");
+    const selectedContainer = document.querySelector(".wrapper-arrange__products");
     const btnDeleteSelectedCards = document.querySelector(".cart-content__added-products-delete-selected-ones");
     const btnAllSelectProducts = document.querySelector(".cart-content__added-products-select");
-    const btnDeleteProduct = document.querySelector(".added-card__remove");
+
 
     // Класс для управления корзиной
+
     class CartManager {
-        cartItems = []; // Товары в корзине
-        cartStorageKey = "dnr-sale-cart"; // Ключ для хранения корзины в localStorage
-        selectedProducts = []; // Массив выбранных товаров (отмеченных чекбоксами)
-        selectedProductIds = []; // Массив id выбранных товаров
-
+        cardItems = [];
+        selectedProducts = [];
         constructor() {
-            // Привязываем обработчики событий
-            this.loadCart.bind(this);
-            cardsContainer.addEventListener("change", this.changeProductCheckboxes.bind(this));
-            btnDeleteSelectedCards.addEventListener("click", this.btnDeleteSelectedProducts.bind(this));
-            btnAllSelectProducts.addEventListener("click", this.methodAllSelectProducts.bind(this));
+            cardsContainer.addEventListener("change", this.checkboxSelectedProducts.bind(this));
+            btnDeleteSelectedCards.addEventListener("click", this.deleteSelectedCards.bind(this));
+            cardsContainer.addEventListener("click", this.renderQuantityProduct.bind(this));
+            btnAllSelectProducts.addEventListener("click", this.selectedAll.bind(this));
             cardsContainer.addEventListener("click", this.deleteOneProduct.bind(this));
-            cardsContainer.addEventListener("click", this.editQuantityProduct.bind(this));
-        }
-
-        // Загружает корзину из localStorage и отображает товары
-        loadCart() {
-            // localStorage.removeItem("selectedProd");
-            const cartItems = JSON.parse(localStorage.getItem('cart'));
-            if (!cartItems) return;
-            this.cartItems = cartItems;
-            cardsContainer.innerHTML = "";
-
-            // 🟢 Вот эта строка добавит правильное поведение
-            this.selectedProducts = JSON.parse(localStorage.getItem("selectedProd")) || [];
-
-            // Обновляем число товаров в иконке корзины
-            this.updateCartIconCount();
-
-            // Отрисовываем карточки товаров в корзине
-            this.renderCartItems();
-
-            // Отрисовываем выбранные товары для оформления
-            this.renderArrangeProducts();
-            // Подсчитываем количество и сумму выбранных товаров
-            this.selectedQuantityAndAmount();
-
-            // При запуске определяем и устанавливаем состояние кнопки "Выбрать всё"
-            this.conditionBtnAllSelectProducts();
-            // btnAllSelectProducts.classList.remove("active-select-all");
-
 
         }
 
-        // Метод определения и устанавки состояния кнопки "Выбрать всё"
-        conditionBtnAllSelectProducts() {
-
-            const allCheckbox = document.querySelectorAll(".added-card__checkbox");
-
-            console.log(allCheckbox);
+        loadCards() {
+            const cards = JSON.parse(localStorage.getItem("cart")) || [];
+            this.cardItems = cards;
+            // console.log(this.cardItems);
             
+            this.selectedProducts = JSON.parse(localStorage.getItem("selectedCards")) || [];
+            numberOfProducts.textContent = this.cardItems.length;
+            localStorage.setItem("cart", JSON.stringify(this.cardItems));
+            this.renderCards();
+            this.showBtnDeleteAll();
+            this.renderSelectedCards();
+            this.calcSelectedProducts();
+        }
 
-            const allChecked = allCheckbox.length >= 1 ? Array.from(allCheckbox).every(function (elem) {
-                return elem.checked === true;
-            }) : false;
-
-            
-            console.log(allChecked);
-            
-            // Если все карточки выбраны, то добавляем класс активности кнопке 
-            if (allChecked) {
-                btnAllSelectProducts.classList.add("active-select-all");
-            } else {
-                btnAllSelectProducts.classList.remove("active-select-all");
+        renderCards() {
+            const products = JSON.parse(localStorage.getItem("cart")) || [];
+            const selectedProducts = JSON.parse(localStorage.getItem("selectedCards")) || [];
+            let selectedId = [];
+            if (selectedProducts && selectedProducts.length >= 1) {
+                selectedId = selectedProducts.map(prod => {
+                    return prod.id;
+                });
             }
 
+            // let checked;
+            if (products.length >= 1) {
+                cardsContainer.innerHTML = "";
+                products.forEach(product => {
+
+                // console.log(selectedId);
+                
+
+
+
+                    let html = `
+                <div class="added-card" data-id="${product.id}">
+                    <label class="added-card__select">
+                        <input type="checkbox" class="added-card__checkbox"
+                        ${selectedId.includes(product.id) ? "checked" : ""}
+                        />
+                        <span></span>
+                    </label>
+                    <div class="added-card__image">
+                        <img src="${product.images}" alt="${product.title}" />
+                    </div>
+                    <div class="added-card__info">
+                        <div class="added-card__title">${product.title}</div>
+                        <div class="added-card__descr">${product.descr}</div>
+                        <div class="added-card__price">${Math.round(product.price * 90)} ₽</div>
+                    </div>
+                    <div class="added-card__quantity">
+                        <button class="quantity-btn quantity-btn--minus">−</button>
+                        <span class="quantity-value">${product.quantity}</span>
+                        <button class="quantity-btn quantity-btn--plus">+</button>
+                    </div>
+                    <button class="added-card__remove">
+                        <i class="fa-solid fa-trash"></i> Удалить
+                    </button>
+                </div>`;
+                    cardsContainer.insertAdjacentHTML("afterbegin", html);
+                });
+            } else {
+                cardsContainer.innerHTML = "";
+                cardsContainer.textContent = "Нет добавленных товаров";
+            }
         }
 
-        saveCart() {
-            // Заглушка для сохранения корзины (реализация не добавлена)
-        }
+        checkboxSelectedProducts(e) {
+            const cardCheckbox = e.target.closest(".added-card");
+            const idCardCheckbox = Number(cardCheckbox.dataset.id);
 
-        removeFromCart() {
-            // Заглушка для удаления товара из корзины (реализация не добавлена)
-        }
-
-        clearCart() {
-            // Заглушка для очистки корзины (реализация не добавлена)
-        }
-
-        editQuantityProduct(e) {
-            const productCard = e.target.closest(".added-card");
-            const productId = Number(e.target.closest(".added-card").dataset.id);
-            let productQuantityMinus;
-            let productQuantityPlus;
-
-            if (e.target.classList.contains("quantity-btn--minus")) {
-                this.cartItems.forEach(product => {
-                    if (product.id === productId) {
-                        if (product.quantity >= 2) {
-                            product.quantity -= 1;
-                            productCard.querySelector(".quantity-value").textContent = product.quantity;
-                            productQuantityMinus = product.quantity;
-
-                            
-                        } else {
-                            product.quantity = 1;
-                            productCard.querySelector(".quantity-value").textContent = product.quantity;
-                            productQuantityMinus = product.quantity;
-                        }
+            if (e.target.checked) {
+                this.cardItems.forEach(prod => {
+                    if (prod.id === idCardCheckbox) {
+                        this.selectedProducts.push(prod);
                     }
+                });
+                
+                if (this.selectedProducts.length === 0) {
+                    btnDeleteSelectedCards.classList.add("hidden");
+                } else {
+                    btnDeleteSelectedCards.classList.remove("hidden");
+                }
 
+                localStorage.setItem("selectedCards", JSON.stringify(this.selectedProducts));
+                this.showBtnDeleteAll();
+                this.renderSelectedCards();
+                this.calcSelectedProducts();
 
-
-
+            } else {
+                const selectedCards = this.selectedProducts.filter(prod => {
+                    return prod.id != idCardCheckbox;
                 });
 
+                this.selectedProducts = selectedCards;
+
+                if (this.selectedProducts.length === 0) {
+                    btnDeleteSelectedCards.classList.add("hidden");
+                } else {
+                    btnDeleteSelectedCards.classList.remove("hidden");
+                }
+
+                localStorage.setItem("selectedCards", JSON.stringify(this.selectedProducts));
+                this.showBtnDeleteAll();
+                this.renderSelectedCards();
+                this.calcSelectedProducts();
+            }
+        }
+
+        renderSelectedCards() {
+            const products = JSON.parse(localStorage.getItem("selectedCards")) || [];
+
+            if (products.length >= 1) {
+                selectedContainer.innerHTML = "";
+                products.forEach(selectProd => {
+                    let html = `
+                    <div class="arrange-card" data-id="${selectProd.id}">
+                        <div class="arrange-card__image">
+                            <img src="${selectProd.images}" alt="${selectProd.title}" />
+                        </div>
+                        <div class="arrange-card__info">
+                            <div class="arrange-card__title">${selectProd.title}</div>
+                            <div class="arrange-card__price">${Math.round(selectProd.price * 90)} ₽</div>
+                        </div>
+                        <div class="arrange-card__quantity">
+                            <span class="arrange-card__quantity-value">${selectProd.quantity}</span> Шт
+                        </div>
+                    </div>`;
+
+                    selectedContainer.insertAdjacentHTML("afterbegin", html);
+                });
+            } else {
+                selectedContainer.innerHTML = "Нет выбранных товаров";
+            }
+        }
+
+        calcSelectedProducts() {
+            let AllSelectedProd = 0;
+            let AllMoneys = 0;
+            const selectedCards = JSON.parse(localStorage.getItem("selectedCards")) || [];
+            if (selectedCards.length >= 1) {
+                selectedCards.forEach(prod => {
+                    AllSelectedProd += prod.quantity;
+                    AllMoneys += Math.round(prod.price * 90) * prod.quantity;
+                    quantityAllSelectedProd.textContent = AllSelectedProd;
+                    quantityAllAmountSelectedProdprod.textContent = AllMoneys;
+                });
+            } else {
+                AllSelectedProd = 0;
+                AllMoneys = 0;
+                quantityAllSelectedProd.textContent = AllSelectedProd;
+                quantityAllAmountSelectedProdprod.textContent = AllMoneys;
+            }
+        }
+
+        deleteSelectedCards(e) {
+            const selectedCards = JSON.parse(localStorage.getItem("selectedCards")) || [];
+            const idSelectedCards = selectedCards.map(prod => prod.id);
+            this.cardItems = this.cardItems.filter(prod => {
+                return !idSelectedCards.includes(prod.id);
+            });
+            this.selectedProducts = [];
+            localStorage.setItem("cart", JSON.stringify(this.cardItems));
+            localStorage.setItem("selectedCards", JSON.stringify(this.selectedProducts));
+            numberOfProducts.textContent = this.cardItems.length;
+
+
+            if (this.selectedProducts.length === 0) {
+                btnDeleteSelectedCards.classList.add("hidden");
+            } else {
+                btnDeleteSelectedCards.classList.remove("hidden");
+            }
+
+            this.renderCards();
+            this.renderSelectedCards();
+            this.calcSelectedProducts();
+        }
+
+        renderQuantityProduct(e) {
+            // const quantityValue = document.querySelector(".quantity-value");
+            if (!e.target.classList.contains("quantity-btn")) return;
+
+            const targetCardProd = e.target.closest(".added-card");
+            const productId = Number(e.target.closest(".added-card").dataset.id);
+            // console.log(productId);
+
+            let quantityMinus;
+            let quantityPlus;
+            
+            if (!productId) return;
+
+
+
+            if (e.target.classList.contains("quantity-btn--minus")) {
+                // console.log(this.cardItems);
+                
+                 this.cardItems.forEach(item => {
+                    if (item.id === productId && item.quantity > 1) {
+                        item.quantity -= 1;
+                        targetCardProd.querySelector(".quantity-value").textContent = item.quantity;
+                        quantityMinus = item.quantity;
+                    } else if (item.id === productId && item.quantity === 1) {
+                        item.quantity = 1;
+                        targetCardProd.querySelector(".quantity-value").textContent = item.quantity;
+                        quantityMinus = item.quantity;
+                    }
+                }); 
 
                 this.selectedProducts.forEach(selectProd => {
                     if (selectProd.id === productId) {
-                        selectProd.quantity = productQuantityMinus;
-                        document.querySelector(`.arrange-card[data-id="${productId}"]`).querySelector(".arrange-card__quantity-value").textContent = selectProd.quantity;
+                        selectProd.quantity = quantityMinus;
+
+                        if (!selectedCardsContainer.querySelector(`.arrange-card[data-id="${productId}"]`)) return;
+
+                        selectedCardsContainer.querySelector(`.arrange-card[data-id="${productId}"]`).querySelector(".arrange-card__quantity-value").textContent = selectProd.quantity;
                     }
                 });
 
-                localStorage.setItem("cart", JSON.stringify(this.cartItems));
-                localStorage.setItem("selectedProd", JSON.stringify(this.selectedProducts));
 
-                this.selectedQuantityAndAmount();
-
-
-                
-
+                localStorage.setItem("selectedCards", JSON.stringify(this.selectedProducts));
+                localStorage.setItem("cart", JSON.stringify(this.cardItems));
+                this.calcSelectedProducts();
             }
 
             if (e.target.classList.contains("quantity-btn--plus")) {
-                this.cartItems.forEach(product => {
-                    if (product.id === productId) {
-                        if (product.quantity < 10) {
-                            product.quantity += 1;
-                            productCard.querySelector(".quantity-value").textContent = product.quantity;
-                            productQuantityPlus = product.quantity;
-                        } else {
-                        product.quantity = 10;
-                        productCard.querySelector(".quantity-value").textContent = product.quantity;
-                        productQuantityPlus = product.quantity;
-                        }
+
+                this.cardItems.forEach(item => {
+                    if (item.id === productId && item.quantity < 10) {
+                        item.quantity += 1;
+                        targetCardProd.querySelector(".quantity-value").textContent = item.quantity;
+                        quantityPlus = item.quantity;
+                    } else if (item.id === productId && item.quantity >= 10) {
+                        item.quantity = 10;
+                        targetCardProd.querySelector(".quantity-value").textContent = item.quantity;
+                        quantityPlus = item.quantity;
                     }
                 });
-
 
                 this.selectedProducts.forEach(selectProd => {
                     if (selectProd.id === productId) {
-                        selectProd.quantity = productQuantityPlus;
-                        document.querySelector(`.arrange-card[data-id="${productId}"]`).querySelector(".arrange-card__quantity-value").textContent = selectProd.quantity;
+                        selectProd.quantity = quantityPlus;
+
+                        if (!selectedCardsContainer.querySelector(`.arrange-card[data-id="${productId}"]`)) return;
+
+                        selectedCardsContainer.querySelector(`.arrange-card[data-id="${productId}"]`).querySelector(".arrange-card__quantity-value").textContent = selectProd.quantity;
+                        
                     }
                 });
 
+                localStorage.setItem("selectedCards", JSON.stringify(this.selectedProducts));
+                localStorage.setItem("cart", JSON.stringify(this.cardItems));
 
+                this.calcSelectedProducts();
 
-
-                localStorage.setItem("cart", JSON.stringify(this.cartItems));
-                localStorage.setItem("selectedProd", JSON.stringify(this.selectedProducts));
-
-                this.selectedQuantityAndAmount();
-    
             }
+
+
 
         }
 
-        // Метод выбора всех карточек
-        methodAllSelectProducts(e) {
-            const allCheckbox = document.querySelectorAll(".added-card__checkbox");
+        selectedAll(e) {
 
-            const allChecked = Array.from(allCheckbox).every(function (elem) {
-                return elem.checked === true;
-            });
+             const allCheckbox = document.querySelectorAll(".added-card__checkbox");
 
-            if (allChecked) {
+            const selectProds = JSON.parse(localStorage.getItem("selectedCards")) || [];
+            
+           if (selectProds && selectProds.length === this.cardItems.length) {
+                allCheckbox.forEach(check => {
 
-            allCheckbox.forEach(checkbox => {
-                checkbox.checked = false;
+                check.checked = false;
+                });
                 this.selectedProducts = [];
-                btnAllSelectProducts.classList.remove("active-select-all");
-            });
+                localStorage.setItem("selectedCards", JSON.stringify(this.selectedProducts));
+                this.showBtnDeleteAll();
+                this.renderSelectedCards();
+                this.calcSelectedProducts();
+           }
 
-            } else {
-            allCheckbox.forEach(checkbox => {
-                checkbox.checked = true;
-                this.selectedProducts = this.cartItems;
-                btnAllSelectProducts.classList.add("active-select-all");
-            });
-            }
+           if (selectProds && selectProds.length < this.cardItems.length) {
+                allCheckbox.forEach(check => {
 
+                    check.checked = true;
+                });
+                this.selectedProducts = this.cardItems;
+                
+                localStorage.setItem("selectedCards", JSON.stringify(this.selectedProducts));
+                this.showBtnDeleteAll();
+                this.renderSelectedCards();
+                this.calcSelectedProducts();
+           }
 
-            localStorage.setItem("selectedProd", JSON.stringify(this.selectedProducts));
-
-            // Обновляем карточки для оформления и подсчёт сколько
-            this.renderArrangeProducts();
-            this.selectedQuantityAndAmount();
-
-
-
-        }
-
-        // Отображает карточки товаров в корзине
-        renderCartItems() {
-            console.log(this.cartItems);
             
 
-            if (this.cartItems.length <= 0) return; 
 
-            // Получаем товары отмеченные чекбоксами из localStorage
-            const checkboxCards = JSON.parse(localStorage.getItem("selectedProd")) || [];
+  
 
 
-            this.cartItems.forEach((product, i) => {
-                // Определяем, отмечен ли чекбокс для товара
-
-                let isChecked = checkboxCards.some(item => item.id === product.id) ? "checked" : "";
-
-
-                
-                // Формируем HTML карточки товара
-                let html = `
-                    <div class="cart-content__added-products-cards" id="${product.id}">
-                        <div class="added-card" data-id="${product.id}">
-                        <!-- Чекбокс для выбора товара -->
-                        <label class="added-card__select">
-                            <input type="checkbox" class="added-card__checkbox"  
-                            ${isChecked}/>
-                            <span></span>
-                        </label>
-                        <!-- Фото товара -->
-                        <div class="added-card__image">
-                            <img src="${product.images}" alt="${product.title}" />
-                        </div>
-                        <!-- Информация о товаре -->
-                        <div class="added-card__info">
-                            <div class="added-card__title">${product.title}</div>
-                            <div class="added-card__descr">${product.descr}</div>
-                            <div class="added-card__price">${Math.round(product.price * 90)} ₽</div>
-                        </div>
-                        <!-- Управление количеством -->
-                        <div class="added-card__quantity">
-                            <button class="quantity-btn quantity-btn--minus">−</button>
-                            <span class="quantity-value">${product.quantity}</span>
-                            <button class="quantity-btn quantity-btn--plus">+</button>
-                        </div>
-                        <!-- Кнопка удаления -->
-                        <button class="added-card__remove">
-                            <i class="fa-solid fa-trash"></i> Удалить
-                        </button>
-                        </div>
-                    </div>
-                `;
-                // Вставляем карточку в контейнер
-                cardsContainer.insertAdjacentHTML("afterbegin", html);
-            });
-        }
-
-        // Обработка выбора товаров через чекбоксы
-        changeProductCheckboxes(e) {
-        const product = e.target.closest(".added-card");
-        const productId = Number(product.dataset.id);
-
-        const foundProduct = this.cartItems.find(p => p.id === productId);
-        if (!foundProduct) return;
-
-        if (e.target.checked) {
-            // Добавляем, если ещё не добавлен
-            const alreadySelected = this.selectedProducts.some(p => p.id === productId);
-            if (!alreadySelected) this.selectedProducts.push(foundProduct);
-        } else {
-            // Удаляем
-            this.selectedProducts = this.selectedProducts.filter(p => p.id !== productId);
-            btnAllSelectProducts.classList.remove("active-select-all");
-        }
-
-        if (this.selectedProducts.length === this.cartItems.length) {
-            btnAllSelectProducts.classList.add("active-select-all");
-        }
-
-        // Сохраняем обновлённый массив
-        localStorage.setItem("selectedProd", JSON.stringify(this.selectedProducts));
-
-        // Обновляем интерфейс
-        this.selectedQuantityAndAmount();
-        this.renderArrangeProducts();
         }
 
 
-
-        // Подсчёт количества и суммы выбранных товаров
-        selectedQuantityAndAmount() {
-            const products = JSON.parse(localStorage.getItem("selectedProd")) || [];
-
-            if (products.length >= 1) {
-                let prodAll = 0;
-                let prodAmount = 0;
-
-                // Показываем кнопку удаления выбранных товаров
-                selectedProductsDelete.classList.remove("hidden");
-                products.forEach((prod) => {
-                    prodAmount += Math.round(prod.price * 90) * prod.quantity;
-                    prodAll += prod.quantity;
-                });
-
-                // Обновляем отображение количества и суммы
-                prodAllSpan.textContent = prodAll;
-                prodAmountSpan.textContent = `${prodAmount} ₽`;
-
-            } 
-            if (products.length <= 0) {
-                // Если ничего не выбрано — скрываем кнопку и сбрасываем значения
-                selectedProductsDelete.classList.add("hidden");
-                prodAllSpan.textContent = "0";
-                prodAmountSpan.textContent = `0 ₽`;
+        showBtnDeleteAll() {
+            const selectProds = JSON.parse(localStorage.getItem("selectedCards")) || [];
+            if (selectProds && selectProds.length >= 1) {
+                btnDeleteSelectedCards.classList.remove("hidden");
+            } else {
+                btnDeleteSelectedCards.classList.add("hidden");
             }
         }
 
-        // Удаляет выбранные товары из корзины по выбранным чекбоксами
-        btnDeleteSelectedProducts(e) {
-            localStorage.removeItem("cart");
-            // Собираем id выбранных товаров
-            const selectedIds = new Set(this.selectedProducts.map(prod => prod.id));
-            // Оставляем только те товары, которые не были выбраны
-            this.cartItems = this.cartItems.filter(item => !selectedIds.has(item.id));
-            // Обновляем число товаров в иконке корзины
-            this.updateCartIconCount();
-            // Сохраняем обновлённую корзину
-            localStorage.setItem("cart", JSON.stringify(this.cartItems));
 
-            // Очищаем и перерисовываем карточки
-            cardsContainer.innerHTML = "";
-            this.renderCartItems();
-
-            // Очищаем массив выбранных товаров
-            this.selectedProducts = [];
-            btnAllSelectProducts.classList.remove("active-select-all");
-            localStorage.setItem("selectedProd", JSON.stringify(this.selectedProducts));
-
-            // Если ничего не выбрано — скрываем кнопку и сбрасываем значения
-            selectedProductsDelete.classList.add("hidden");
-            prodAllSpan.textContent = "0";
-            prodAmountSpan.textContent = `0 ₽`;
-
-            // Обновляем отображение выбранных товаров для оформления
-            this.renderArrangeProducts();
-
-        }
-
-        // Удаляет один товар после нажатия на кнопку "Удалить", которая внутри карточки товара
         deleteOneProduct(e) {
 
-            const productId = e.target.closest(".added-card").dataset.id;
+            if (!e.target.classList.contains("added-card__remove")) return;
+
+            const productCard = e.target.closest(".added-card");
+            const productId = Number(productCard.dataset.id);
+            
+            
+            
 
             if (e.target.classList.contains("added-card__remove")) {
-                this.cartItems = this.cartItems.filter(prod => {
+                // console.log(productId);
+                this.cardItems = this.cardItems.filter(prod => {
                     return prod.id != productId;
                 });
-
                 this.selectedProducts = this.selectedProducts.filter(prod => {
                     return prod.id != productId;
                 });
 
-                localStorage.setItem("cart", JSON.stringify(this.cartItems));
-                localStorage.setItem("selectedProd", JSON.stringify(this.selectedProducts));
+                localStorage.setItem("cart", JSON.stringify(this.cardItems));
+                localStorage.setItem("selectedCards", JSON.stringify(this.selectedProducts));
 
-                // Обновляем число товаров в иконке корзины
-                this.updateCartIconCount();
-
-                // Отрисовываем карточки товаров в корзине
-                cardsContainer.innerHTML = "";
-                this.renderCartItems();
-
-                // Отрисовываем выбранные товары для оформления
-                this.renderArrangeProducts();
-                // Подсчитываем количество и сумму выбранных товаров
-                this.selectedQuantityAndAmount();
-
-                // Определяем состояние кнопки "Выбрать всё"
-                this.conditionBtnAllSelectProducts();
-                }
-
-        }
-
-        // Отображение выбранных товаров для оформления заказа
-        renderArrangeProducts() {
-            // wrapperArrangeProducts.innerHTML = "";
-
-            const products = JSON.parse(localStorage.getItem("selectedProd"));
-
-            if (products.length >= 1) {
-
-                // console.log("Product");
-                
-
-                // console.log(products);
-                
-
-
-                wrapperArrangeProducts.innerHTML = "";
-                products.forEach((prod) => {
-                    let html = `
-                        <div class="arrange-card" data-id="${prod.id}">
-                            <div class="arrange-card__image">
-                                <img src="${prod.images}" alt="${prod.title}" />
-                            </div>
-                            <div class="arrange-card__info">
-                                <div class="arrange-card__title">${prod.title}</div>
-                                <div class="arrange-card__price">${Math.round(prod.price * 90)} ₽</div>
-                            </div>
-                            <div class="arrange-card__quantity">
-                                <span class="arrange-card__quantity-value">${prod.quantity}</span> Шт
-                            </div>
-                        </div>
-                    `;
-                    wrapperArrangeProducts.insertAdjacentHTML("afterbegin", html);
-                });
-            } 
-            if (products.length <= 0) {
-                // Если ничего не выбрано — выводим сообщение
-                wrapperArrangeProducts.innerHTML = "";
-                wrapperArrangeProducts.textContent = "Нет выбранных товаров";
+                this.renderCards();
+                this.renderSelectedCards();
+                this.calcSelectedProducts();
+                this.showBtnDeleteAll();
             }
         }
 
-        // Обновляет число товаров в иконке корзины
-        updateCartIconCount() {
-            numberOfProducts.textContent = this.cartItems.length;
-        }
+        
+
     }
 
     // Инициализация менеджера корзины и загрузка корзины
     const cartManager = new CartManager();
-    cartManager.loadCart();
+    cartManager.loadCards();
 });
+
+
+
+
+                // let html = `
+                //     <div class="cart-content__added-products-cards" id="${product.id}">
+                //         <div class="added-card" data-id="${product.id}">
+                //         <!-- Чекбокс для выбора товара -->
+                //         <label class="added-card__select">
+                //             <input type="checkbox" class="added-card__checkbox"  
+                //             ${isChecked}/>
+                //             <span></span>
+                //         </label>
+                //         <!-- Фото товара -->
+                //         <div class="added-card__image">
+                //             <img src="${product.images}" alt="${product.title}" />
+                //         </div>
+                //         <!-- Информация о товаре -->
+                //         <div class="added-card__info">
+                //             <div class="added-card__title">${product.title}</div>
+                //             <div class="added-card__descr">${product.descr}</div>
+                //             <div class="added-card__price">${Math.round(product.price * 90)} ₽</div>
+                //         </div>
+                //         <!-- Управление количеством -->
+                //         <div class="added-card__quantity">
+                //             <button class="quantity-btn quantity-btn--minus">−</button>
+                //             <span class="quantity-value">${product.quantity}</span>
+                //             <button class="quantity-btn quantity-btn--plus">+</button>
+                //         </div>
+                //         <!-- Кнопка удаления -->
+                //         <button class="added-card__remove">
+                //             <i class="fa-solid fa-trash"></i> Удалить
+                //         </button>
+                //         </div>
+                //     </div>
+                // `;
+                // // Вставляем карточку в контейнер
+                // cardsContainer.insertAdjacentHTML("afterbegin", html);
+
+
+
+                    //                 let html = `
+                    //     <div class="arrange-card" data-id="${prod.id}">
+                    //         <div class="arrange-card__image">
+                    //             <img src="${prod.images}" alt="${prod.title}" />
+                    //         </div>
+                    //         <div class="arrange-card__info">
+                    //             <div class="arrange-card__title">${prod.title}</div>
+                    //             <div class="arrange-card__price">${Math.round(prod.price * 90)} ₽</div>
+                    //         </div>
+                    //         <div class="arrange-card__quantity">
+                    //             <span class="arrange-card__quantity-value">${prod.quantity}</span> Шт
+                    //         </div>
+                    //     </div>
+                    // `;
+                    // wrapperArrangeProducts.insertAdjacentHTML("afterbegin", html);
